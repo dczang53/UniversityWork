@@ -1,9 +1,0 @@
-The upper half of the screen is divided into three parts. The left screen
-displays the structure of the repository with each head organized into
-branches. The middle screen displays who commited the changes and their
-emails. The right column shows the date the commit was made.
-The lower half is divided into two parts, and generally shows the information
-of a commit selected from the upper half. The left screen shows the ChangeLoc
-information of the commit and sometimes the file changes from the diff files
-(not shown in this case). The right screen shows the files changed by the
-commit (in this case, only comment is changed).
