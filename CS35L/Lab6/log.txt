@@ -1,0 +1,72 @@
+First, we make sure the version of "sort" is at least 8.6.
+
+"sort --version"
+
+[Output]
+sort (GNU coreutils) 8.22
+Copyright (C) 2013 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by Mike Haertel and Paul Eggert.
+
+
+To generate a file of 10000000 lines of a single float value, we run:
+
+"od -v -An -N 40000000 -tfF < /dev/urandom | tr ' ' '\n' | sed '/^$/d' > testdata"
+
+("wc -l testdata" and check in text editor to check if the output is correct)
+(Output: 10000000 testdata)
+
+
+Then, we run "sort -g" with "time -p" to test the time it takes to run:
+
+"time -p sort -g testdata > /dev/null"
+[Output]
+real 22.69
+user 115.78
+sys 0.49
+
+
+We do the same to test the multithreading with 1, 2l 4l and 8 threads:
+"time -p sort -g --parallel=1 testdata > /dev/null"
+[Output]
+real 112.29
+user 112.08
+sys 0.21
+
+
+"time -p sort -g --parallel=2 testdata > /dev/null"
+[Output]
+real 59.92
+user 113.78
+sys 0.25
+
+
+
+"time -p sort -g --parallel=4 testdata > /dev/null"
+[Output]
+real 33.65
+user 113.83
+sys 0.31
+
+
+
+"time -p sort -g --parallel=8 testdata > /dev/null'
+[Output]
+real 21.74
+user 115.08
+sys 0.46
+
+
+As we can see, the real time has decreased with increasing number of threads.
+One thing to note is that running with the multithreading option has a smaller
+user time than running with only one thread, probably because of the overhead
+neede to create a separate thread.
+The user times remained mostly constant, which is somewhat expected because
+the user time is the total amount to time the code spent in the processor
+(in which the times for each thread are summed up).
+The system time going up as the number of threads increases is expected, as
+it would mean that more system calls in the kernel are made (since the number
+of threads to create increased).

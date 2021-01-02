@@ -1,0 +1,7 @@
+A) will always yield 1; Since both x and dx represent the same number (with the same number of bits), they will lose the same bits when converted into float.
+B) won't always yield 1; example: x=INT_MIN, y=INT_MAX
+C) will always yield 1; Associative property of addition (the sum of three doubles derived from ints cannot occupy more than 33 bits of the 52 fractional bits in double, and the exponent cannot overflow because the doubles are derived from ints)
+D) won't always yield 1; example: dx=INT_MAX-1, dy=INT_MAX-2, and dz=INT_MAX (Losing bits in the first nultiplication will affect the second multiply)
+E) won't always yield 1; example: have dx=0, dz=0, or both (yielding NaN)
+
+B requires the use of -fwrapv because of potential overflow when subtracting two ints.

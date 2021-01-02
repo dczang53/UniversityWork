@@ -1,0 +1,37 @@
+#lang racket
+
+(define (sngl-compare x y)
+	(if (equal? x y) x
+		(cond
+		[(and (boolean? x) (boolean? y)) (if x '% (list 'not '%))]
+;		[(and (symbol? x) (symbol? y)) (string->symbol (string-append (symbol->string x) "!" (symbol->string y)))]
+		[else (list 'if '% x y)]
+		)
+	)
+)
+
+(define (list-compare x y)WW
+)
+
+;(quote datum)
+;(lambda formals body)
+;(λ formals body)
+;(if expr expr)
+
+(define (expr-compare x y)
+	(cond
+;	[(and (list? x) (list? y) (= (length x) (length y)))
+;		(if (equal? (car x) (car y)) () ())
+;	]
+	[(and (not (list? x)) (not (list? y))) (sngl-compare x y)]
+	[else (list 'if '% x y)]
+	)
+)
+
+(expr-compare 12 12)
+(expr-compare 12 20)
+(expr-compare #t #t)
+(expr-compare #f #f)
+(expr-compare #t #f)
+(expr-compare #f #t)
+(expr-compare 'x 'y)

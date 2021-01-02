@@ -1,0 +1,2 @@
+Problems 3.67 and 3.70. Submit the answers as plain ASCII text files.
+(p353 & p357)

@@ -1,0 +1,110 @@
+(preamble)
+locale			#checking locale
+export LC_ALL='C'	#setting variable
+sort /usr/share/dict/words > ~/words	#setting up English dictionary (words)
+wget web.cs.ucla.edu/classes/fall17/cs35L/assign/assign2.html	#get html file
+cp assign2.html assign2.txt		#create a text document from html file
+
+
+
+
+
+tr -c 'A-Za-z' '[\n*]' < assign2.txt
+This command tr takes the file assign2.txt through standard input, and
+replaces any character that doesn'trepresent a letter with a newline
+character.
+
+tr -cs 'A-Za-z' '[\n*]' < assign2.txt
+With the additional 's' (squeeze) option, all consecutive matches (any \
+character that is not a letter) will be replaced by only a single newline
+character.
+
+tr -cs 'A-Za-z' '[\n*]' < assign2.txt | sort
+(Note that 'assign2.txt' is added bofre 'sort', because it is to be input to
+'tr' first, not 'sort'). This is just having 'sort' sort the output of the
+previous command in accordance to the ASCII standard (refer to the command
+involving 'locale' and its environment variables above) and output it to
+standard output.
+
+tr -cs 'A-Za-z' '[\n*]' < assign2.txt | sort -u
+This command does the same thing as the previous command, except it only lists
+one instance for each unique word.
+
+tr -cs 'A-Za-z' '[\n*]' < assign2.txt | sort -u | comm - words
+This command will take the output of the previous command, and compare the
+output (denoted by '-') with the file 'words' created earlier. The output will
+be in three columns, the first displaying lines unique to the standard output
+'_', the second lines unique to the file 'words', and the third lines present
+in both.
+
+tr -cs 'A-Za-z' '[\n*]' < assign2.txt | sort -u | comm -23 - words
+Unlike the previous command, this command omits the second and third columns
+of the original output (due to the option '-23'). This will only display
+column 1, the lines unique to the standard output '-'.
+
+
+
+wget mauimapp.com/moolelo/hwnwdseng.htm
+
+
+
+(in buildwords)
+#!/bin/bash
+
+
+
+grep '<td>.\{1,\}<\/td>' $1 |		#get all lines with <td>...</td> tags
+
+sed -n '0~2p' |				#remove all english words (first line and every 2 lines)
+
+sed -E 's/^\s*|<[\/]?(td|u)>//g' |	#remove all the spaces at beginning of line
+					#or the <td> or <u> tags
+
+sed 's/<.*>.*<\/.*>//g' |		#remove remaining tags and anything they contain
+
+tr "A-Z\`" "a-z\'" |
+			#lowercase the letters and change ` to '
+
+sed -E 's/\s|,\s/\n/g' |
+		#remove (comma+space) and (space) with newlines
+
+sed '/^$/d' |
+				#delete empty lines
+
+grep "^[pkmnwlhaeiou\']*$" |
+		#remove words with non-Hawwian spelling
+
+sort -u					#sort the words (and remove duplicates)
+
+
+
+
+
+tr -cs 'A-Za-z' '[\n*]' < assign2.html | tr 'A-Z' 'a-z' | sort -u | comm -23 -
+ hwords | wc -l
+(misspelled words as Hawaiian: 406)
+This command is like the last command above, except it checks for unique words
+in the html file (not in the Hawaiian dictionary). The "wc -l" command counts
+the number of lines in the output (which is the number of misspelled words).
+This number is the number of misspelled words as Hawaiian.
+
+tr -cs 'A-Za-z' '[\n*]' < assign2.html | tr 'A-Z' 'a-z' | sort -u | comm -23 -
+words | wc -l
+(misspelled words as English: 39)
+Like above, this command looks for unique words to the thml file, but this
+time, it counts the number of words misspelled as English.
+
+
+tr -cs 'A-Za-z' '[\n*]' < assign2.html | tr 'A-Z' 'a-z' | sort -u | comm -23 - words | comm -12 - hwords
+(misspelled as English but not Hawaiian: 3) (halau, lau, wiki)
+This command adds a second comparison to the first output with the Hawaiian
+dictionary, and outputs the overlapping words (listed above).
+
+
+tr -cs 'A-Za-z' '[\n*]' < assign2.html | tr 'A-Z' 'a-z' | sort -u | comm -23 - hwords | comm -12 - words | wc -l
+(misspelled as Hawaiian but not English: 370)
+Basically the last command, but vice versa.
+
+
+
+

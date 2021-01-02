@@ -1,0 +1,49 @@
+NAME: Dennis Zang
+EMAIL: dennisczang@gmail.com
+ID: 704766877
+
+Ths files included in this project are:
+lab1a.c
+Makefile
+README
+
+lab1a.c:
+The program, as described in the specs, prints the stdin form the keyboard
+character-at-a-time in noncanonical mode by default, and runs a separate
+process (a bash interpreter) by sending input to and recieving output from
+the bash process in noncanonical mode. To do noncaononical read, I made use of
+the termios API (as stated int he specs). In my code, I implemented the two modes
+by having two instruction sets, in which only one runs depending whether or not
+a flag to detect the "--shell" option is set (which is detected with the get_opts API).
+For the "--shell" instruction set, the terminal process calls fork, and splits into two
+processes: the child that runs the bash interpreter (with input from the terminal parent process)
+and the parent that continuously reads from the keyboard and the terminal process and
+prints the corresponding output. To communicate between the two processes, I used the
+pipe API. In the child process, I replaced the file descriptors 0, 1, and 2 with the
+correct ends of the pipe structure replicated (and closing them all off) before calling
+exec() to "/bin/bash". For the parent process, it reads from file descriptor 0 for keyboard
+input and a file descriptor created for the read end of the pipe coming from the child.
+To prevent blocking, I used the poll API to check each status before blocking to read,
+and then write the corresponding output to STDOUT or the write end of the pipe to the
+child process. To terminate the pair of processes, the parent would send a kill
+signal to child process upon ^C (and any subsequent writes to the pipe leading to it
+would end in a SIGPIPE error) or close the write end of the same pipe as EOF is
+detected upon ^D, which would also terminate the bash interpreter (note that SIGPIPE)
+is handled with a signal handler, while EOF is handled with checking conditions
+continually). Finally, after the final output, the program would write the exit status
+and signal (as stated in the specs).
+
+Below are some of the references I used:
+(various man pages for all the commands in the spec)
+http://tldp.org/LDP/lpg/node11.html
+https://www.geeksforgeeks.org/c-program-demonstrate-fork-and-pipe/
+https://github.com/raoulmillais/linux-system-programming/blob/master/src/poll-example.c
+(Chapter 5 of the textbook "Interlude: Process API")
+
+
+Makefile:
+The makefile simply supports the default, clean, and dist options.
+default: compile lab1a.c into lab1a
+clean: remove lab1a and the tarball
+dist: create the tarball with the required files
+

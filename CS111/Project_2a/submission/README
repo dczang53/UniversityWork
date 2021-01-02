@@ -1,0 +1,179 @@
+NAME: Dennis Zang
+EMAIL: dennisczang@gmail.com
+ID: 704766877
+
+(Problems listed below)
+
+FILES:
+Ths files included in this project are:
+lab2_add.c
+SortedList.h
+SortedList.c
+lab2_list.c
+Makefile
+lab2_add.csv
+lab2_list.csv
+lab2_add-1.png
+lab2_add-2.png
+lab2_add-3.png
+lab2_add-4.png
+lab2_add-5.png
+lab2_list-1.png
+lab2_list-2.png
+lab2_list-3.png
+lab2_list-4.png
+lab2_add.gp
+lab2_list.gp
+
+lab2_add.c:
+The add program is written to increment and decrement a given global counter using multiple threads
+under different conditions (yielding, mutex locking, spin locking, and conditional updates) and
+observe the performances under different combinations of these conditions. It makes use of the pthread
+API to run multiple threads and allow for mutex locking, GCC atomic__sync_builtin functions
+to allow for spin locking and conditional updates, and the gettime() API to log how long the program
+has run.
+
+SortedList.h:
+Given with the project (specifies the data structures and functions required)
+(interface for the SortedList_t and SortedListElement_t structs, along with the functions
+for insertion, deletion, lookup, and length)
+
+SortedList.c:
+Includes the implementations of the above interface.
+
+lab2_list.c:
+The list program makes use of the given interface from SortedList.h and updates a sorted list under
+different conditions for yielding (on different operations) and locking (spin locking and mutex locking).
+It uses the same APIs as lab2_add.c, and in addition, it implements more versions of the functions given in 
+the sorted list interface.
+
+Makefile:
+The Makefile includes the means to compile the C programs, runs tests and collects data, uses the data
+to plot graphs, tars the files for submission, and clean up the executables if needed.
+What each option does can be found below.
+(build): (default) Simply compiles the C program into the executables "lab2_add" and "lab2_list" with the
+-Wall and -Wextra options, and links them with the libraries needed (ie pthread.h, Sortedlist.h)
+(tests): Runs the necessary tests for the *.csv files needed for graphs, with different numbers of threads,
+iterations, yields, and lock types (note that the the add tests eac run the add program 3 times)
+(NOTE: takes a few minutes to run)
+(graphs): Creates the graphs of the program's performance under different conditions using the data in the
+*.csv files
+(dist): Simply creates the tarball including the files listed above
+(clean): Cleans the folder of the executables, *.csv, and *.png files
+
+lab2_add-1.png:
+Plots the runs that ran with out failure without any form of locks (with and without yields)
+
+lab2_add-2.png:
+Plots the time it takes for each threads to run with and without iterations for different numbers
+of iterations for 2 and 8 threads
+
+lab2_add-3.png:
+Plots the time it takes for 1 thread to run with and without iterations for different numbers
+of iterations
+
+lab2_add-4.png:
+Plots the runs that ran with out failure with each form of lock under yielding
+(note that the tests are only done for 10000 iterations for mutexes and CAS, and 1000 for spin locks)
+
+lab2_add-5.png:
+Plots the average time per operation per number of threads for increasing number of threads
+
+lab2_list-1.png:
+Plots the cost per operation for increasing number of iterstion (on a single thread)
+
+lab2_list-2.png:
+Plots the successful runs for differen tnumber of iterations, different number of threads,
+and different yield conditions
+
+lab2_list-3.png:
+Plots the successful runs for different number of iterations, different number of threads, different
+lock types, and different yield conditions
+
+lab2_list-4.png:
+Plots the cost per operation per number of threads (for 1000 iterations) and under different lock types
+
+lab2_add.gp/lab2_list.gp:
+These two scripts were given to plot all of the necessary graphs above.
+
+
+
+
+
+PROBLEMS:
+QUESTION 2.1.1 - causing conflicts:
+(Why does it take many iterations before errors are seen?)
+According to lab2_add-1.png, it takes 10000 for 2 threads to fail, and merely above 10 iterations for 4 and
+greater to fail.
+
+(Why does a significantly smaller number of iterations so seldom fail?)
+A significantly smaller number of iterations would be less likely to fail because there would be less contention
+for the shared resource (the counter) and less untimely context switching that would update the counter incorrectly.
+
+
+
+QUESTION 2.1.2 - cost of yielding:
+(Why are the --yield runs so much slower?)
+(Where is the additional time going?)
+The --yield runs are much slower because if forces the thread to give up the CPU, and becomes queued so other higher priority threads can run. In this case,
+the increasing the number of context switches means that more times is needed for switching, storing and loading registers repeatedly, along with the yielding
+from the CPU.
+
+(Is it possible to get valid per-operation timings if we are using the --yield option?)
+(If so, explain how. If not, explain why not.)
+With the yield option, it is not likely we can can accurate per-operation timings as the time for context switches are included in the total run time,
+which shouldn't be included when calculating per-operation times. However, it is still possible, if we were to only take note of how long each thread runs
+in the CPU and ignore the context switches.
+
+
+
+QUESTION 2.1.3 - measurement errors:
+(Why does the average cost per operation drop with increasing iterations?)
+The average time per operation should drop with increasing iterations because of the proportion of the time spent on the operations vs the overhead of
+creating the thread(s) increase. Creating a thread would have a significant cost, and the greater the number of iterations, the more time the thread
+operations would take and thus the overhead of creating the thread would be less impactful on the total run time (as shown in lab2_add-2.png and lab2_add-3.png).
+
+(If the cost per iteration is a function of the number of iterations, how do we know how many iterations to run (or what the "correct" cost is)?)
+If we were to assume that the total time is given by a function of the form f(x) = mx + b, in which m is the cost per operation and b is the overhead of thread
+creation, we can find m by solving (f(x)-b)/x. Since we only know f(x), the total run time, we can only calculate f(x)/x, and thus we would need to maximize x
+(increasing f(x) as well) so that the overhead b would be insignificant.
+
+
+
+QUESTION 2.1.4 - costs of serialization:
+(Why do all of the options perform similarly for low numbers of threads?)
+As mentioned above, because the overhead of thread creation dominates over the time the actual operations take place in the thread(s), all of the locking  options
+would perform similarly, as the times for the locking and function operations would be insignificant.
+
+(Why do the three protected operations slow down as the number of threads rises?)
+As the numbers of threads rises, the operations would slow down due to the new overhead of the locks. With more threads, the locks acting on the threads would
+act more frequencly, meaning that there would be less throughput (in this case, smaller number of threads running to total number of threads). In other words,
+the ratio of work being done by the threads to the total amount of work to do is much smaller because essentially only one thread can run at a time. The total
+amount of time running in the threads would then include the time being locked out of operations.
+
+
+
+QUESTION 2.2.1 - scalability of Mutex
+(Compare the variation in time per mutex-protected operation vs the number of threads in Part-1 (adds) and Part-2 (sorted lists).)
+(Comment on the general shapes of the curves, and explain why they have this shape.)
+(Comment on the relative rates of increase and differences in the shapes of the curves, and offer an explanation for these differences.)
+In part 1, the calculated cost per operation would decrease with increasing number of threads, since the overhead woudl have less of an impact on the total
+run time. However, in part 2, the calculated time per operation would initially decrease with increasing operations, but then increse linearly. This is because,
+unlike the add program in part 1, the time per thread operations is proportional to the number of iterations (due to increasing list elements), instead of constant
+like the operations in part 1. Thus, the total run time can be described as a function in the form f(x) = (x(mx)+b) = mx^2+b, in which m is the time per operation
+and b is the overhead of thread creationa quadratic. The time per operation can then be described as f(x)/x, or (mx^2+b)/x, which describes this behavior precisely
+(refer to lab2_list-1.png).
+
+
+
+QUESTION 2.2.2 - scalability of spin locks
+(Compare the variation in time per protected operation vs the number of threads for list operations protected by Mutex vs Spin locks. Comment on the general shapes of the curves, and explain why they have this shape.)
+(Comment on the relative rates of increase and differences in the shapes of the curves, and offer an explanation for these differences.)
+If we were to look at the plot in lab2_list-5.png, we would see that the spin lock trendline would increase exponentially (linearly in the picture due to
+logarithmic scale). The mutex lock trendline increases in a more linear fashion (curved in the actual plot again due to the scale). This is likely because
+spin locks would take up the CPU time, as opposed to the yields from the CPU the mutex locks provide. Thus, there would be more contention over the CPU between
+multiple threads due to spin locks as opposed to simply queueing using the mutex locks. Because the progress of the program is proportional to the amount of time
+the thread spends in the CPU, yielding the CPU and queueing would be more efficient and have a more linear run time with respect to the number of iterations. In
+the spin lock situation, the threads would all still be active, and the total amount of time each thread would spend on the CPU would be x times greater, with x
+being the number of threads active, since it would only be progressing 1/x of the time due to the contention. Of course, for mutexes, there are overheads from
+context switches, but that is still insignificant to the contention from spin locking.

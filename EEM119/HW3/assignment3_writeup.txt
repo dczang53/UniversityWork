@@ -1,0 +1,20 @@
+Problem 1:
+Hexiwear:
+
+
+Raspberry Pi:
+For the Raspberry Pi, for each MAC address to connect to, we instantiated a new thread to maintain the connection between the Raspberry Pi and the Hexiwear. Each thread is basically an instance of a "gatttool" interactive session instantiated using the "pexpect" module, to which we would send commands in order to make a connection and write output to. Note that we used try/except blocks to ensure that the Raspberry Pi stays connected, as the bluetooth connection isn't stable. The threads would each run in an infinite loop that would continuously send the command "char-write-req 61 xxx..." to write to handle 61 on the Hexiwear at a frequency a bit less than every 2 seconds, which would force the Hexiwear to update its time.
+
+Problem 2:
+Hexiwear:
+For the Hexiwear, we attacked interrupts to the buttons that trigger the haptic, along with writing to the handles values that represent which button is pressed  (0 for "none", 1 for "right" , 2 for "left", 3 for "up", and 4 for "down"). After the button is pressed, the Hexiwear would update the values on the the handle (handle 0x65), and would leave it for a while (0.5 seconds) so the Raspberry Pi can sample the data. After the time period, the value would be set back to 0, the default, signifying no buttons were pressed.
+
+Raspberry Pi:
+(publisher.py)
+Again, using the "pexpect" module, we instantiated multiple threads (one for each Hexiwear device), each being a "gatttool" interactive session that serves to communicate with each Hexiwear. The threads would sample read data on handle 0x65 on the Hexiwear ("Alert Out") as quickly as possible (with the command "char-read-hnd 65"), and whenever it detects a change (specific byte value being read is not "0"), it would publish a message on the MQTT server on topic "ecem119/2019s/hexiwear/x", as described in the specs, usng the "paho-mqtt" module/package.
+
+(NOTE: There is a known bug with gatttool on some computers in which "char-read-hnd" will result in a segmentation fault and terminate the gatttool session even if the handle being read is correct. If it doesn't work, this is likely the case [worked on the 16GB SSD Raspberry Pi, but not on 8GB and Fedora when developing this project].)
+(https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=901101)
+
+(client)
+The client program is a simple infinite loop that runs forever. However, it is subscribed to the MQTT topic "ecem119/2019s/hexiwear/#" will interrupt and print the message "event b @ x" as described in the specs in the terminal.

@@ -1,0 +1,232 @@
+(PREPARATIONS FOR MODIFICATION)
+(run on lnxsrv09.seas.ucla.edu)
+First, after downloading and unzipping the lab handout, I ran
+
+make seq
+./seq
+
+to record the time the program takes without any modifications, leading to the following outputs
+(I ran it 5 times with ./seq for certainty)
+
+(first run)
+FUNC TIME : 0.745394
+TOTAL TIME : 2.612664
+
+(second run)
+FUNC TIME : 0.749605
+TOTAL TIME : 2.596054
+
+(third run)
+FUNC TIME : 0.735305
+TOTAL TIME : 2.520575
+
+(fourth run)
+FUNC TIME : 0.736942
+TOTAL TIME : 2.508485
+
+(fifth run)
+FUNC TIME : 0.735766
+TOTAL TIME : 2.512142
+
+Then, I ran
+
+make clean
+make seq GPROF=1
+./seq
+grof seq | less
+
+to profile the amount of time each function is run and the number of times each are called, resulting in
+
+
+
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total
+ time   seconds   seconds    calls  ms/call  ms/call  name
+ 73.52      0.58     0.58       15    38.72    39.99  func1
+ 12.68      0.68     0.10  5177344     0.00     0.00  rand2
+  3.80      0.71     0.03        1    30.04   111.16  addSeed
+  2.54      0.73     0.02        2    10.01    10.01  init
+  2.54      0.75     0.02                             filter
+  1.27      0.76     0.01       15     0.67     0.67  func2
+  1.27      0.77     0.01       15     0.67     0.67  func4
+  1.27      0.78     0.01        1    10.01    10.01  imdilateDisk
+  1.27      0.79     0.01                             sequence
+  0.00      0.79     0.00   983042     0.00     0.00  round
+  0.00      0.79     0.00   491520     0.00     0.00  findIndexBin
+  0.00      0.79     0.00       16     0.00     0.00  dilateMatrix
+  0.00      0.79     0.00       15     0.00     0.00  func3
+  0.00      0.79     0.00       15     0.00     0.00  func5
+  0.00      0.79     0.00       15     0.00     0.00  rand1
+  0.00      0.79     0.00        2     0.00     0.00  get_time
+  0.00      0.79     0.00        1     0.00     0.00  elapsed_time
+  0.00      0.79     0.00        1     0.00     0.00  fillMatrix
+  0.00      0.79     0.00        1     0.00     0.00  func0
+  0.00      0.79     0.00        1     0.00     0.00  getNeighbors
+
+(" | less" allows the output to be displayed one page at a time, and I <spaced> repeated for the full output)
+(only the first part of the profile report is shown here, since its the only thing we really need)
+From what we can see, func1 took the most time, then func2 and func4, then func3, func5, and func0 (called only once).
+This will be the order in which I will prioritize modifying.
+
+It is also important to check how many processors we can work with, so we know how many threads we can use at most.
+To check, I entered
+
+grep -c ^processor /proc/cpuinfo
+
+and got
+
+32
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+(CONSIDERATIONS FOR AND MODIFICATIONS TO FUNC.C)
+
+(func0)
++"omp_set_num_threads(30);"
+
+This is added to ensure that there will only be 30 threads running at a time (as there are onyl 32 processors).
+I placed it in func0 specifically because it ensures all omp directives in func0 and following will follow this
+condition (setting the variable OMP_NUM_THREADS to 30). In addition, I set it to 30 (there should't be more than
+32 threads, or else context switching will be a problem [tests show that the program slows down]), as it ran the
+fastest (this was tested with numbers 25-25 [see testcases.txt]).
+
+
+
++"pragma omp parallel for"
+
+This basically has the for loop run in parallel (the 'i' counter is implicitly private).
+
+
+----------
+
+
+(func1)
+-"for(i = 0; i < n; i++){
+
+	arrayX[i] += 1 + 5*rand2(seed, i);
+
+	arrayY[i] += -2 + 2*rand2(seed, i);
+
+}"
+
++	"arrayX[i] += 1 + 5*rand2(seed, i);
+
+	arrayY[i] += -2 + 2*rand2(seed, i);"
+
+I took out the first loop and added the contents in the second, as doing so would save the function from looping
+n times. Because the second loop didn't access anything except for the ith position of these arrays, the first loop
+is essentially unnecessary.
+
+
+
++"#pragma omp parallel for private(j, index_X, index_Y)"
+
+I added this directive only for the outside of the nested loop (placing it outside means less threads to create
+and join in total, as opposed to having each nested for loop having their own thread [resulting in n X (inner loop
+counter) threads as opposed to just n threads running at most 30 at a time]). For each thread, j, index_X, and index_Y
+are shared, so we must indicate that each thread has a specific value (and have each be a private variable in each thread).
+
+
+----------
+
+
+(func2)
++"pragma omp parallel for reduction(+:sumWeights)"
+
++"sumWeights += weights[i];"
+
+-"for(i = 0; i < n; i++)
+
+	sumWeights += weights[i];"
+
+
+I added this to have the loop run in a multithreaded option (as usual). In this case, all the loops share a variable
+to increment, and to avoid synchonization errors (in loading, updating, and storing the variable), I added the "reduction"
+clause, and indicated that the variable "sumWeights" is a shared counter.
+
+In addition, the second loop is unnecessary, as it never accessed any other term but the ith. So, I deleted the second loop
+and placed its contents in the first, reducing the function 1 case of loop iterations.
+
+
+
++"pragma omp parallel for"
+
+Typical multithreaded for loop
+
+
+----------
+
+
+(func3)
++"#pragma omp parallel for reduction(+:estimate_x, estimate_y)"
+
+Same logic as the case in func2 (see above for +"pragma omp parallel for reduction(+:sumWeights)").
+
+
+----------
+
+
+(func4)
++"pragma omp parallel for"
+
+Typical multithreaded for loop
+
+
+
+----------
+
+
+
+(func5)
++"pragma omp parallel for"
+
+Typical multithreaded for loop
+
+
+
++"pragma omp parallel for"
+
+Typical multithreaded for loop
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+(CHECKING FOR CORRECTNESS AND SPEEDUP)
+After making the necessary changes, we do the following to check for correctness, speed, and memory leaks, respectively.
+
+make clean
+make omp GPROF=1
+./omp
+gprof omp | less
+
+make clean
+make omp
+./omp
+
+make check
+
+make clean
+make omp MTRACE=1
+make checkmem
+
+
+(One of the things I found was that, depending on how busy the server is, func will run at different speeds,
+with different times with different set_omp_num_threads(var) for optimum speed)
+(would recommend from 28-30)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,168 @@
+
+Synchronized 5 10000
+Threads average 4827.48 ns/transition
+
+Synchronized 5 100000
+Threads average 1720.58 ns/transition
+
+Synchronized 5 1000000
+Threads average 547.620 ns/transition
+
+Synchronized 10 10000
+Threads average 14400.7 ns/transition
+
+Synchronized 10 100000
+Threads average 4015.53 ns/transition
+
+Synchronized 10 1000000
+Threads average 991.043 ns/transition
+
+Synchronized 20 10000
+Threads average 23808.1 ns/transition
+
+Synchronized 20 100000
+Threads average 8403.65 ns/transition
+
+Synchronized 20 1000000
+Threads average 2916.87 ns/transition
+
+Synchronized 40 10000
+Threads average 65514.8 ns/transition
+
+Synchronized 40 100000
+Threads average 18568.8 ns/transition
+
+Synchronized 40 1000000
+Threads average 5901.45 ns/transition
+
+Unsynchronized 5 10000
+Threads average 3820.84 ns/transition
+sum mismatch (4096 != 4124)
+
+Unsynchronized 5 100000
+Threads average 1247.47 ns/transition
+sum mismatch (4096 != 3735)
+
+Unsynchronized 5 1000000
+Threads average 671.826 ns/transition
+sum mismatch (4096 != 3128)
+
+Unsynchronized 10 10000
+Threads average 14287.3 ns/transition
+sum mismatch (4096 != 4092)
+
+Unsynchronized 10 100000
+Threads average 3049.02 ns/transition
+negative output (-34 != 0)
+
+Unsynchronized 10 1000000
+Threads average 2183.05 ns/transition
+sum mismatch (4096 != 2919)
+
+Unsynchronized 20 10000
+Threads average 30564.7 ns/transition
+sum mismatch (4096 != 4088)
+
+Unsynchronized 20 100000
+Threads average 6638.64 ns/transition
+sum mismatch (4096 != 4144)
+
+Unsynchronized 20 1000000
+Threads average 6538.03 ns/transition
+sum mismatch (4096 != 3171)
+
+Unsynchronized 40 10000
+Threads average 65380.4 ns/transition
+sum mismatch (4096 != 4103)
+
+Unsynchronized 40 100000
+Threads average 13361.1 ns/transition
+sum mismatch (4096 != 3768)
+
+Unsynchronized 40 1000000
+Threads average 5798.37 ns/transition
+sum mismatch (4096 != 2260)
+
+GetNSet 5 10000
+Threads average 7782.79 ns/transition
+sum mismatch (4096 != 4089)
+
+GetNSet 5 100000
+Threads average 1885.22 ns/transition
+sum mismatch (4096 != 4244)
+
+GetNSet 5 1000000
+Threads average 783.919 ns/transition
+sum mismatch (4096 != 5020)
+
+GetNSet 10 10000
+Threads average 28609.4 ns/transition
+sum mismatch (4096 != 4122)
+
+GetNSet 10 100000
+Threads average 7101.52 ns/transition
+sum mismatch (4096 != 4352)
+
+GetNSet 10 1000000
+Threads average 2746.86 ns/transition
+sum mismatch (4096 != 4090)
+
+GetNSet 20 10000
+Threads average 56485.5 ns/transition
+sum mismatch (4096 != 4148)
+
+GetNSet 20 100000
+Threads average 10323.0 ns/transition
+sum mismatch (4096 != 4139)
+
+GetNSet 20 1000000
+Threads average 9966.53 ns/transition
+sum mismatch (4096 != 4578)
+
+GetNSet 40 10000
+Threads average 106558 ns/transition
+sum mismatch (4096 != 4070)
+
+GetNSet 40 100000
+Threads average 17723.0 ns/transition
+sum mismatch (4096 != 4239)
+
+GetNSet 40 1000000
+Threads average 20652.5 ns/transition
+sum mismatch (4096 != 5608)
+
+BetterSafe 5 10000
+Threads average 8684.97 ns/transition
+
+BetterSafe 5 100000
+Threads average 1446.73 ns/transition
+
+BetterSafe 5 1000000
+Threads average 437.565 ns/transition
+
+BetterSafe 10 10000
+Threads average 19088.7 ns/transition
+
+BetterSafe 10 100000
+Threads average 3138.80 ns/transition
+
+BetterSafe 10 1000000
+Threads average 895.416 ns/transition
+
+BetterSafe 20 10000
+Threads average 53082.3 ns/transition
+
+BetterSafe 20 100000
+Threads average 7593.70 ns/transition
+
+BetterSafe 20 1000000
+Threads average 1893.86 ns/transition
+
+BetterSafe 40 10000
+Threads average 117682 ns/transition
+
+BetterSafe 40 100000
+Threads average 20203.6 ns/transition
+
+BetterSafe 40 1000000
+Threads average 5000.20 ns/transition

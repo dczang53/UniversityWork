@@ -1,0 +1,34 @@
+NAME: Dennis Zang
+EMAIL: dennisczang@gmail.com
+ID: 704766877
+
+Ths files included in this project are:
+lab3a.c
+ext2_fs.h
+Makefile
+README
+
+lab3a.c:
+The C program reads a file system image, with the name given as the first argument. The
+program then reads the individual blocks groups, and prints out summaries of the superblocks and
+group descriptors, lists the free inodes and blocks, lists all existing files (directory, regualar file,
+symbolic link, etc...), lists all directory links, and lists all indirectly referenced blocks.
+
+The program works as follows: (for each group): first make a copy of the superblock and group descriptor table
+(the latter to be used to traverse every group) and initialize some information like block size, number of block
+groups, etc...; then make a copy of the block bitmap, inode bitmap, and inode table for the group; then traverse
+the block bitmap to find all free blocks and list them; then traverse the inode bitmap and list free inodes or
+print a summary of the existing file (along with their contents (if directory) or their indirectly refereced blocks).
+
+ext2_fs.h:
+The given header file with the structs for the superblock, group descriptor, inode descriptor, directory entry, and
+other constants.
+
+Makefile:
+The Makefile includes the means to compile the C program, perform smoke tests on the executable, 
+tar the files for submission, and clean up the executables if needed. What each option does
+can be found below.
+(make): Simply compiles the C program into the executable "lab3a" with the -Wall and
+-Wextra options with gcc.
+(make dist): Simply builds the distributed tarball using the tar command.
+(make clean): Simply removes the executable "lab3a" using the rm command

@@ -1,0 +1,149 @@
+
+Synchronized 5 10000
+Threads average 154874 ns/transition
+
+Synchronized 5 100000
+Threads average 13374.3 ns/transition
+
+Synchronized 5 1000000
+Threads average 1208.50 ns/transition
+
+Synchronized 10 10000
+Threads average 497199 ns/transition
+
+Synchronized 10 100000
+Threads average 46476.8 ns/transition
+
+Synchronized 10 1000000
+Threads average 4465.20 ns/transition
+
+Synchronized 20 10000
+Threads average 1.75136e+06 ns/transition
+
+Synchronized 20 100000
+Threads average 183600 ns/transition
+
+Synchronized 20 1000000
+Threads average 17892.3 ns/transition
+
+Synchronized 40 10000
+Threads average 6.31839e+06 ns/transition
+
+Synchronized 40 100000
+Threads average 732993 ns/transition
+
+Synchronized 40 1000000
+Threads average 72329.4 ns/transition
+
+Unsynchronized 5 10000
+Threads average 116336 ns/transition
+
+Unsynchronized 5 100000
+Threads average 11832.6 ns/transition
+
+Unsynchronized 5 1000000
+Threads average 1138.46 ns/transition
+sum mismatch (4096 != 4150)
+
+Unsynchronized 10 10000
+Threads average 532884 ns/transition
+
+Unsynchronized 10 100000
+Threads average 48138.4 ns/transition
+
+Unsynchronized 10 1000000
+Threads average 5566.84 ns/transition
+sum mismatch (4096 != 4094)
+
+Unsynchronized 20 10000
+Threads average 1.55305e+06 ns/transition
+
+Unsynchronized 20 100000
+Threads average 218590 ns/transition
+
+Unsynchronized 20 1000000
+Threads average 16749.0 ns/transition
+
+Unsynchronized 40 10000
+Threads average 6.18952e+06 ns/transition
+
+Unsynchronized 40 100000
+Threads average 782678 ns/transition
+
+Unsynchronized 40 1000000
+Threads average 59580.3 ns/transition
+sum mismatch (4096 != 4095)
+
+GetNSet 5 10000
+Threads average 140179 ns/transition
+
+GetNSet 5 100000
+Threads average 12814.0 ns/transition
+
+GetNSet 5 1000000
+Threads average 1271.31 ns/transition
+sum mismatch (4096 != 4022)
+
+GetNSet 10 10000
+Threads average 456931 ns/transition
+
+GetNSet 10 100000
+Threads average 52035.5 ns/transition
+
+GetNSet 10 1000000
+Threads average 4321.57 ns/transition
+
+GetNSet 20 10000
+Threads average 1.92366e+06 ns/transition
+
+GetNSet 20 100000
+Threads average 163625 ns/transition
+
+GetNSet 20 1000000
+Threads average 18616.2 ns/transition
+
+GetNSet 40 10000
+Threads average 6.68693e+06 ns/transition
+sum mismatch (4096 != 4101)
+
+GetNSet 40 100000
+Threads average 620360 ns/transition
+
+GetNSet 40 1000000
+Threads average 74486.0 ns/transition
+
+BetterSafe 5 10000
+Threads average 85415.1 ns/transition
+
+BetterSafe 5 100000
+Threads average 12484.6 ns/transition
+
+BetterSafe 5 1000000
+Threads average 2173.55 ns/transition
+
+BetterSafe 10 10000
+Threads average 456080 ns/transition
+
+BetterSafe 10 100000
+Threads average 51181.7 ns/transition
+
+BetterSafe 10 1000000
+Threads average 4926.57 ns/transition
+
+BetterSafe 20 10000
+Threads average 2.03719e+06 ns/transition
+
+BetterSafe 20 100000
+Threads average 164731 ns/transition
+
+BetterSafe 20 1000000
+Threads average 18112.2 ns/transition
+
+BetterSafe 40 10000
+Threads average 7.21836e+06 ns/transition
+
+BetterSafe 40 100000
+Threads average 684702 ns/transition
+
+BetterSafe 40 1000000
+Threads average 72143.1 ns/transition

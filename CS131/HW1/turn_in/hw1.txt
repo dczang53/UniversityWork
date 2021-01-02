@@ -1,0 +1,37 @@
+Homework 1
+Dennis Zang
+#704766877
+
+(*1: subset a b*)
+For this function, I simply wrote for it to recursively check if the head of list a exists in b,
+and have it return false if not in b, otherwise return <true> and <conditional of next element>.
+
+(*2: equal_sets a b*)
+Simply check if each set is a subset of the other (a property that must hold true for equal sets.
+
+(*3: set_union a b*)
+Here, we first convert the lists into sets, and store them as local variables. Then we can simply
+recursively, we simply take one set and recursively concatenate elements into the other set if it
+doesn't exist in the other set.
+
+(*4: set_intersection a b*)
+Here, like the last problem, I created local sets from the given list arguments, and recursively
+took one list and checked which elements existed in the other (and ultimately concatenated all
+the mutual elements into one list).
+
+(*5: set_diff a b*)
+Here, I created local sets, then recursively checked which elements are unique to set a,
+and concatenated them into a list.
+
+(*6: computed_fixed_point eq f x*)
+Here, I simply ran an (infinite?) recursive function that checked if x and (f x) satisfy eq
+(if not, recursively run it again with (f x) as x until eq is satisfied).
+
+(*7: filter_reachable g*)
+In general, this function works by returning a pair of the first given starting nonterminal
+(from the pair) and the list filtered of all nonreachable rules. To get the filtered list, I wrote
+two main local functions: "find_new_nonterm" that recursively returns a list of all reachable
+tokens from a given list of reachable tokens, and "filter" that concatenates a new list using
+only reachable rules using the reachable token list from the previous function.
+(The are also 2 local helper functions used by the aforementioned main functions.)
+

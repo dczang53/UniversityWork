@@ -1,0 +1,26 @@
+NAME: Dennis Zang
+EMAIL: dennisczang@gmail.com
+ID: 704766877
+
+Ths files included in this project are:
+lab4c_tcp.c
+lab4c_tls.c
+Makefile
+README
+
+lab4c_tcp.c:
+The C program is basically the exact same as lab4b, except that it now uses tcp sockets to
+communicate with the server "lever.cs.ucla.edu" on port 18000 (code from lab1b).
+
+lab4c_tls.c:
+Basically the same as lab4c_tcp, except that it communicates with the server on port 19000 and
+also sets up ssl on top of the tcp connection for encryption.
+
+Makefile:
+The Makefile includes the means to compile the C program, perform smoke tests on the executable, 
+tar the files for submission, and clean up the executables if needed. What each option does
+can be found below.
+(default): Simply compiles the C programs into the executables "lab4c_tcp" and "lab4c_tls" with the options
+-Wall -Wextra (and library flags -lssl -lcrypto for lab4c_tls and -lmraa -lm fir both) options with gcc.
+(dist): Simply builds the distributed tarball using the tar command.
+(clean): Simply removes the executables "lab4c_tcp" and "lab4c_tls" with the tarball using the rm command

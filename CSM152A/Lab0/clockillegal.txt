@@ -1,0 +1,6 @@
+always@(a,b)
+a0 <= ~a0
+a1 <= a1^a0
+//this won't work as both statements in same capture block will occur at same time
+//solution: separate capture blocks???
+//http://www.asic-world.com/verilog/veritut.html

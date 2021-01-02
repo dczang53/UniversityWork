@@ -1,0 +1,98 @@
+lab1a.c
+Makefile
+README
+... checking for README file
+    README ... OK
+... checking for submitter ID in README
+    single submitter: 704766877
+... checking for submitter email in README
+    single address: dennisczang@gmail.com ... OK
+... checking for submitter name in README
+    submitter(s): Dennis Zang ... OK
+... checking for other expected files
+    Makefile ... OK
+... checking for other files of expected types
+    lab1a.c ... OK
+... checking for required Make targets
+    Makefile target clean ... OK
+    Makefile target dist ... OK
+... checking for required compillation options
+    Makefile includes Wall ... OK
+    Makefile includes Wextra ... OK
+... building default target(s)
+    RC=0 ... OK
+    error output ...  NONE
+... checking make dist
+tar -czf lab1a-704766877.tar.gz lab1a.c Makefile README
+    RC=0 ... OK
+    error output ...  NONE
+    lab1a-704766877.tar.gz ... OK
+ ... checking make clean
+    RC=0 ... OK
+    restored to freshly untar-ed state ... OK
+... redo default make
+    RC=0 ... OK
+    error output ...  NONE
+... checking for expected products
+    ./lab1a ... OK
+... ./lab1a detects/reports bogus arguments
+    RC=1 ... OK
+        ./lab1a: unrecognized option '--bogus'
+Invalid option
+... downloading pty_test.c from www.cs.ucla.edu/classes/cs111/Software
+... building pty_test
+pty_test.c: In function ‘main’:
+pty_test.c:472:4: error: ‘for’ loop initial declarations are only allowed in C99 mode
+    for( int i = 0; i < nargs; i++ ) {
+    ^
+pty_test.c:472:4: note: use option -std=c99 or -std=gnu99 to compile your code
+FATAL: build failure on pty_test.c
+[dennisz@lnxsrv09 ~/111/proj1a/submission]$ export PATH=/usr/local/cs/bin:$PATH
+[dennisz@lnxsrv09 ~/111/proj1a/submission]$ ./SanCheck.sh 704766877
+Deleting old /tmp/CS111_test.dennisz
+... using test directory /tmp/CS111_test.dennisz
+... extracting /u/cs/ugrad/dennisz/111/proj1a/submission/lab1a-704766877.tar.gz
+lab1a.c
+Makefile
+README
+... checking for README file
+    README ... OK
+... checking for submitter ID in README
+    single submitter: 704766877
+... checking for submitter email in README
+    single address: dennisczang@gmail.com ... OK
+... checking for submitter name in README
+    submitter(s): Dennis Zang ... OK
+... checking for other expected files
+    Makefile ... OK
+... checking for other files of expected types
+    lab1a.c ... OK
+... checking for required Make targets
+    Makefile target clean ... OK
+    Makefile target dist ... OK
+... checking for required compillation options
+    Makefile includes Wall ... OK
+    Makefile includes Wextra ... OK
+... building default target(s)
+    RC=0 ... OK
+    error output ...  NONE
+... checking make dist
+tar -czf lab1a-704766877.tar.gz lab1a.c Makefile README
+    RC=0 ... OK
+    error output ...  NONE
+    lab1a-704766877.tar.gz ... OK
+ ... checking make clean
+    RC=0 ... OK
+    restored to freshly untar-ed state ... OK
+... redo default make
+    RC=0 ... OK
+    error output ...  NONE
+... checking for expected products
+    ./lab1a ... OK
+... ./lab1a detects/reports bogus arguments
+    RC=1 ... OK
+        ./lab1a: unrecognized option '--bogus'
+Invalid option
+... downloading pty_test.c from www.cs.ucla.edu/classes/cs111/Software
+... building pty_test
+-rwxr-xr-x 1 dennisz csugrad 23320 Jan 21 19:07 pty_test

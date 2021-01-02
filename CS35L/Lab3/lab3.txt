@@ -1,0 +1,171 @@
+1.
+(Grab Coreutils 7.6.)
+
+-Download the tar file from the link given on the webpage
+
+-"tar -xvf coreutils-7.6.tar.gz"
+ [Extract the files from the tar file.]
+
+
+
+
+
+2.
+(Compile and install your copy of Coreutils into a temporary directory...)
+
+-"mkdir CoreutilsDir"
+ [Create the directory for the installation.]
+
+-"cd corutils-7.6"
+-./configure --prefix=/u/cs/ugrad/dennisz/CoreutilsDir
+ [RUn the configure program given in the folder to make the Makefile.]
+
+-"make"
+ [The Makefile compiles the .c and .h files in its /src directory to create
+ their corresponding  object files (placed here as well).]
+
+-"make install"
+ [Installs the files into the directory "corutils-7.6" (see above).]
+
+
+3.
+(Reproduce the bug on your machine with the unmodified version of coreutils.)
+
+-"cd ~/CoreutilsDir/bin"
+-"export LC_ALL='en_US.UTF-8'"
+-"./ls -l /bin/bash"
+ [Run the bugged version of ls with the LC_ALL setting.]
+ (output: -rwxr-xr-x 1 root root 942200 2017-02-15 04:37 /bin/bash)
+
+-"ls -l /bin/bash"
+ [Compare with the normal version of ls.]
+(output: -rwxr-xr-x 1 root root 942200 Feb 15  2017 /bin/bash)
+
+
+4. 
+(Use Emacs or Vim to apply Brady's patch.)
+
+ [Created a file containing the patch file contents from the link given.]
+ [Placed in a file called "b_patch".]
+
+-"cd coreutils-7.6"
+-"patch -p1 < b_patch"
+ [Apply the patch (set the "pnum" value to one, so that the "a" amd "b"
+ directories mentioned in the patch file is omitted.]
+
+-"make"
+ [Recompile the .c and .h files.]
+
+5.
+(Type the command make at the top level of your source tree..
+..For each command that gets executed, explain why it needed to be executed..)
+
+ [THe output from running make again is listed below.]
+
+make  all-recursive
+make[1]: Entering directory `/w/home.14/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6'
+Making all in lib
+make[2]: Entering directory `/w/home.14/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6/lib'
+make  all-recursive
+make[3]: Entering directory `/w/home.14/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6/lib'
+make[4]: Entering directory `/w/home.14/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6/lib'
+make[4]: Leaving directory `/w/home.14/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6/lib'
+make[3]: Leaving directory `/w/home.14/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6/lib'
+make[2]: Leaving directory `/w/home.14/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6/lib'
+Making all in src
+make[2]: Entering directory `/w/home.14/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6/src'
+make  all-am
+make[3]: Entering directory `/w/home.14/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6/src'
+  CC     ls.o
+  CCLD   dir
+  CCLD   vdir
+  CCLD   ls
+make[3]: Leaving directory `/w/home.14/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6/src'
+make[2]: Leaving directory `/w/home.14/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6/src'
+Making all in doc
+make[2]: Entering directory `/w/home.14/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6/doc'
+make[2]: Nothing to be done for `all'.
+make[2]: Leaving directory `/w/home.14/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6/doc'
+Making all in man
+make[2]: Entering directory `/w/home.14/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6/man'
+  GEN    dir.1
+  GEN    vdir.1
+  GEN    ls.1
+make[2]: Leaving directory `/w/home.14/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6/man'
+Making all in po
+make[2]: Entering directory `/w/home.14/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6/po'
+make[2]: Nothing to be done for `all'.
+make[2]: Leaving directory `/w/home.14/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6/po'
+Making all in tests
+make[2]: Entering directory `/w/home.14/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6/tests'
+make[2]: Nothing to be done for `all'.
+make[2]: Leaving directory `/w/home.14/cs/ugrad/dennisz/35L/Assign3/coreutils-7. 6/tests'
+Making all in gnulib-tests
+make[2]: Entering directory `/w/home.14/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6/gnulib-tests'
+make  all-recursive
+make[3]: Entering directory `/w/home.14/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6/gnulib-tests'
+make[4]: Entering directory `/w/home.14/cs/ugrad/dennisz/35L/Assign3/coreutils-7 .6/gnulib-tests'
+make[4]: Nothing to be done for `all-am'.
+make[4]: Leaving directory `/w/home.14/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6/gnulib-tests'
+make[3]: Leaving directory `/w/home.14/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6/gnulib-tests'
+make[2]: Leaving directory `/w/home.14/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6/gnulib-tests'
+make[2]: Entering directory `/w/home.14/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6'
+make[2]: Nothing to be done for `all-am'.
+make[2]: Leaving directory `/w/home.14/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6'
+make[1]: Leaving directory `/w/home.14/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6'
+
+ [The make program recursively checks all of the files and those in
+ subdirectories. Here, the program enters and leaves multiple directories
+ without doing anything else. The only files that were modifies were files
+ like ls.o, dir, vdir, ls, dir.l, vdir.l, and ls.l.]
+
+6.
+(Make sure your change fixes the bug, by testing that the modified ls works on
+your test case and that the installed ls doesn't...)
+
+-"cd ~/CoreutilsDir/bin"
+-"./ls -l /bin/bash"
+([unmpatched] output: -rwxr-xr-x 1 root root 942200 2017-02-15 04:37 /bin/bash)
+
+-"cd ~/coreutils-7.6/src"
+-"./ls -l /bin/bash"
+([patched] output: -rwxr-xr-x 1 root root 942200 Feb 15  2017 /bin/bash)
+
+
+
+(Checking with modified dates)
+
+
+-cd ~/CoreutilsDir/bin
+-./ls -l ~/35L/Assign3/coreutils-7.6/b_patch
+([unpatched] output: -rwx------ 1 dennisz csugrad 1039 2017-10-20 18:09 /u/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6/b_patch)
+
+-"cd ~/coreutils-7.6/src"
+-"./ls -l ~/35L/Assign3/coreutils-7.6/b_patch"
+([patched] output: -rwx------ 1 dennisz csugrad 1039 Oct 20 18:09 /u/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6/b_patch)
+
+
+
+-"touch -t 201601010101 ~/35L/Assign3/coreutils-7.6/b_patch"
+ [Modify the date.]
+
+-cd ~/CoreutilsDir/bin
+-./ls -l ~/35L/Assign3/coreutils-7.6/b_patch
+([unpatched] output: -rwx------ 1 dennisz csugrad 1039 2016-01-01 01:01 /u/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6/b_patch)
+
+-cd ~/coreutils-7.6/src
+-./ls -l ~/35L/Assign3/coreutils-7.6/b_patch
+([patched] output: -rwx------ 1 dennisz csugrad 1039 Jan  1  2016 /u/cs/ugrad/dennisz/35L/Assign3/coreutils-7.6/b_patch)
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,66 @@
+#!/bin/bash
+
+#(Initialize everything before loops)
+#All filenames are stored in variable 'check', with all newlines translated
+#into '?'
+#(since ? is an illegal filename character, and \n are translated into '\s'
+#otherwise.
+#IFS is set to '?' in order to properly separate the filesnames stored
+#two arrays are set up so that dot names and no-dot names are sorted properly
+IFS="?"
+export LC_ALL='C'
+check=`ls -a $1 | sort | tr '\n' '?'`
+directory=$1
+declare -a dot
+declare -a nodot
+sdot=0
+sndot=0
+
+#The loop here separates dot and no-dot filenames, which will be appened to
+#each other later so that the precedence is as stated in the specs
+for CH in $check
+do
+	if [[ -r "$directory/$CH" ]]
+	then
+		if [[ -f "$directory/$CH" && ! -L "$directory/$CH" ]]
+		then
+			if [[ $CH =~ ^\..* ]]
+			then
+				dot[$sdot]=$CH
+				((sdot++))
+			else
+				nodot[$sndot]=$CH
+				((sndot++))
+			fi
+		fi
+	else
+		echo "Error: $directory/$CH is not readable"
+	fi
+done
+
+#Append the two arrays so that the dot filenames are first.
+all=("${dot[@]}" "${nodot[@]}")
+((alls=$sdot+$sndot))
+
+#In this nested loop, the files are traversed incrementally, and each
+#subsequent file is checked to see if it matches with the current.
+#Since the files are already in order, the precendence of hard linking
+#is not a problem.
+i=0
+while [[ $i -lt $alls ]]
+do
+	((j=$i+1))
+	while [[ $j -lt $alls ]]
+	do
+		cmp -s "$directory/${all[$i]}" "$directory/${all[$j]}"
+		if [[ $? -eq 0 ]]
+		then
+			ln -f "$directory/${all[$i]}" "$directory/${all[$j]}"
+		fi
+		((j++))
+	done
+	((i++))
+done
+
+
+#this can all be tested using "la -ai <directory>"

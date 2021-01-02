@@ -1,0 +1,46 @@
+Homework 2
+Dennis Zang
+#704766877
+
+(*#3: make_matcher gram*)
+For this function, I simply made it check a given fragment starting from the longest possible
+prefix, then recursively check the next longest prefix if there the longest prefix is not
+acceptible. For the current prefix being checked, I recursively checked the first term of the
+current pattern. If it is a terminal symbol, and it matches, I recursively check the remainder
+of the prefix with the pattern. If it is a nonterminal, I called a parallel recursive function
+that checks all the possible patterns that can replace the nonterminal symbol, replace the
+symbol with the first pattern, and check if the prefix is acceptible with the new pattern (if not,
+I would proceed to recursively use the remaining list, and replace the nonterminal with the next
+pattern on the list. If there is not matching nonterminal pattern substitutions, or on the first
+mismatching terminal symbol, the function would return an empty list, indicating a failure, which
+would backtrack to the most current call of the parallel recursive function that checks all
+possible nonterminal list substitutions. In addition, on a given match, the function would also
+check if the acceptor accepts the resulting suffix, and if not, the function would treat it as a
+mismatch and continue.
+
+(*#4: make_parser gram*)
+This function has zero dependencies or internal relation with make_matcher. When make_matcher checks
+if a prefix matches pattern, it does not record which sub-pattern has substituted which node, and
+its method of backtracking lacks any notion of hierarchy. For make_parser, the function continuously
+records a stack of prefixes matched and suffixes to match/replace, and calls a child function for
+every match/substitution (the child function would have a modified prefix/suffix pair to indicate
+it's progress of checking), returning the child function's value (if empty list, it's a failure, and
+like make_matcher, the failure would fall through to hte most recent call of the parallel
+"nonterminal-substituting" function, which would try other substitutions in the same order as the
+make_matcher function.
+
+(*Potential Weaknesses*)
+One would-be vulnerability of the two functions is the possibility that a rule/pattern may recurse
+on itself due to the pre-order left-to-right traversal of the tree (like in the cases of
+right-associative grammars, in which the right-most term can recurse on itself to infinite length).
+In such a case, the tree may never stop to expand itself through substituting nonterminals.
+One solution to this problem (part of my implementation) is to make sure that the tree leaves
+cannot expand longer than the length of the pattern being checked through using extra variables
+and through length checking.
+Another potential vulnerability with the code is the presense of useless rules (a nonterminal mapping
+to the list of rulesin which one of the rules is a list with one element: the same nonterminal).
+Such rules can also result in an infinite loop. The above check utilizing length cannot detect this, so
+the fix would be to make sure that when the function hits a nonterminal node, it would use the function
+"List.filter" to omit any possible useless rules.
+
+

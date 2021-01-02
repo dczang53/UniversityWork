@@ -1,0 +1,55 @@
+12.18
+A.) unsafe
+B.) safe
+C.) unsafe
+
+12.24
+The Rio package buffered read functions (rio_readlineb and io_readnb) are thread safe, as the read values are stored before any post-read
+writes are made (presumeably, if multiple buffered read function threads were operating concurrently with write
+threads). However, if unbuffered reading and writing were happening at the same time on the same file, it
+wouldn't be thread-safe. The buffered read functions are not reentrant, as they can potentially refer to the
+same file multiple times in different threads.
+
+#include <pthread.h>
+#include <stdio.h>
+
+void *thread(int x);
+
+int pwr;
+
+int main(int argc, char **argv)
+{
+	if (argc != 2)
+	{return(0);}
+	pwr = atoi(argv[1]);
+	if (pwr <= 0)
+	{return(0);}
+	if (pwr == 1){
+	printf("Thread 0 done\n");
+	return(0);
+	}
+	pthread_t tid;
+	pthread_create(&tid, NULL, thread, 1);
+	pthread_join(tid, NULL);
+	pthread_create(&tid, NULL, thread, 2);
+	pthread_join(tid, NULL);
+	printf("Thread 0 done\n");
+	return(0);
+}
+
+void *thread(int x)
+{
+	int y = (2*x) + 2;
+	if (y >= (1 << pwr)){
+		printf("Thread %i done\n", x);
+		return NULL;
+	}
+	int z = y - 1;
+	pthread_t tid;
+	pthread_create(&tid, NULL, thread, z);
+	pthread_join(tid, NULL);
+	pthread_create(&tid, NULL, thread, y);
+	pthread_join(tid, NULL);
+	printf("Thread %i done\n", x);
+	return NULL;
+}

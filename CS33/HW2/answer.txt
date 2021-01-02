@@ -1,0 +1,6 @@
+A) Registers %rdi and %ecx store the values for x and n, respectively. Register %rax stores result (initialized to 0). Register %rdx stores mask.
+B) Result is initialized as 0, and mask is initialized as 1.
+C) The test condition for mask (compare it with itself) is to see if it is equal to 0.
+D) Mask is updated by shifting it right by the number enumerated by the last 8 bits of n.
+E) Result is updates by OR (|) the current value with (mask & x).
+F) see loop.c
